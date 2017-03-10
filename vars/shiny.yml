@@ -1,0 +1,38 @@
+# (c) 2016 DataNexus Inc.  All Rights Reserved
+#
+# Defaults for all RStudio server deployments
+---
+application: shiny
+
+# the dependencies (as packages) that are needed for the application
+# that is being installed
+application_package_list: ['R']
+
+# is the EPEL repository needed?
+add_epel_repo: true
+
+# default URL used to download the RStudio server package
+shiny_version: '1.5.1.834'
+app_url: "https://download3.rstudio.org/centos5.9/x86_64/shiny-server-{{shiny_version}}-rh5-x86_64.rpm"
+
+# used to define an array of commands that should be run after installing
+# the packages in the 'application_package_list' (above) but before installing
+# the application itself
+pre_install_commands:
+  - {command: "R -e \"install.packages('shiny', repos='https://cran.rstudio.com/')\"", become_root: true}
+
+# used to define an array of commands that should be run after installing
+# the application
+
+# used to add extra repositories to the list of repositories in the
+# `local.repo` file that is deployed to a node when we're adding a
+# local repository to use in the provisioning process
+#local_repository_url: http://{{yum_repository}}/local.repo
+#local_repository_extra_keys: http://{{yum_repository}}/local-keys.json
+
+# used to define the file (in a local directory) containing the application
+# (as an RPM file)
+local_rstudio_file: ""
+
+# path used to access private keys (defaults to the current working directory)
+private_key_path: "."

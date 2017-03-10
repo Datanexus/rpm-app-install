@@ -1,0 +1,19 @@
+# (c) 2016 DataNexus Inc.  All Rights Reserved
+#
+# Defaults that are for a generic application deployment
+---
+application: application
+
+# the dependencies (as packages) that are needed for the application
+# that is being installed
+application_package_list: []
+
+# is the EPEL repository needed?
+add_epel_repo: false
+
+# used to define the file (in a local directory) containing the application
+# (as an RPM file)
+local_application_file: ""
+
+# path used to access private keys (defaults to the current working directory)
+private_key_path: "."

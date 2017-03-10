@@ -1,0 +1,13 @@
+# (c) 2016 DataNexus Inc.  All Rights Reserved
+---
+- include: run_commands.yml
+  vars:
+    name: "pre-install"
+    command_list: "{{pre_install_commands}}"
+  when: (pre_install_commands | default([])) != []
+- include: install-application-package.yml static=no
+- include: run_commands.yml
+  vars:
+    name: "post-install"
+    command_list: "{{post_install_commands}}"
+  when: (post_install_commands | default([])) != []

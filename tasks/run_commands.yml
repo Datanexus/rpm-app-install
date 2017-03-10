@@ -1,0 +1,8 @@
+# (c) 2016 DataNexus Inc.  All Rights Reserved
+---
+- debug: msg="command_list => {{command_list}}"
+- name: run {{name}} commands
+  shell: "{{item.command}}"
+  become: "{{(item.become_root|default(false)) | lower}}"
+  with_items: "{{command_list}}"
+  environment: "{{environment_vars}}"

@@ -1,0 +1,48 @@
+# (c) 2016 DataNexus Inc.  All Rights Reserved
+---
+# First, build our application host group
+- name: Create application host group
+  hosts: "{{host_inventory}}"
+  gather_facts: no
+  tasks:
+    - include_role:
+        name: build-app-host-groups
+      vars:
+        host_group_list:
+          - name: "{{application}}"
+      when: cloud == 'aws' or cloud == 'osp'
+    - include_role:
+        name: build-app-host-groups
+      vars:
+        host_group_list:
+          - { name: "{{application}}", node_list: "{{host_inventory}}" }
+      when: cloud == "vagrant"
+
+# Then, deploy our application to the nodes in the application host group
+- name: Install application on the selected server(s)
+  hosts: "{{application}}"
+  gather_facts: no
+  vars_files:
+    - "vars/{{application | default('app-install')}}.yml"
+  vars:
+    - combined_package_list: "{{ (default_packages|default([])) | union(application_package_list|default([])) | union((install_packages_by_tag|default({})).application|default([])) }}"
+  pre_tasks:
+    - name: Ensure the network interfaces are up on our application node(s)
+      service:
+        name: network
+        state: restarted
+      become: true
+    - name: Gather facts from the application node(s)
+      setup:
+    - include_role:
+        name: setup-web-proxy
+    - include: 'tasks/add-epel-repo.yml'
+      when: add_epel_repo
+  roles:
+    - role: setup-web-proxy
+    - role: add-local-repository
+      yum_repository: "{{yum_repo_url}}"
+      when: yum_repo_url is defined
+    - role: install-packages
+      package_list: "{{combined_package_list}}"
+    - role: dn-app-install

@@ -1,0 +1,16 @@
+# (c) 2016 DataNexus Inc.  All Rights Reserved
+---
+- block:
+  - name: Install 'epel-release' package if the EPEL repository is needed
+    package:
+      name: epel-release
+      state: present
+  - name: "remove all repository entries from the current yum cache"
+    command: yum clean all
+    args:
+      warn: no
+  - name: "list all configured yum repositories"
+    command: yum repolist all
+    args:
+      warn: no
+  become: true

@@ -1,0 +1,29 @@
+# (c) 2016 DataNexus Inc.  All Rights Reserved
+#
+# Defaults for all RStudio server deployments
+---
+application: rstudio
+
+# the dependencies (as packages) that are needed for the application
+# that is being installed
+application_package_list: ['R']
+
+# is the EPEL repository needed?
+add_epel_repo: true
+
+# default URL used to download the RStudio server package
+rstudio_version: '1.0.136'
+app_url: "https://download2.rstudio.org/rstudio-server-rhel-{{rstudio_version}}-x86_64.rpm"
+
+# used to add extra repositories to the list of repositories in the
+# `local.repo` file that is deployed to a node when we're adding a
+# local repository to use in the provisioning process
+#local_repository_url: http://{{yum_repository}}/local.repo
+#local_repository_extra_keys: http://{{yum_repository}}/local-keys.json
+
+# used to define the file (in a local directory) containing the application
+# (as an RPM file)
+local_rstudio_file: ""
+
+# path used to access private keys (defaults to the current working directory)
+private_key_path: "."

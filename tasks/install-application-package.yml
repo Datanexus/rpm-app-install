@@ -1,0 +1,39 @@
+# (c) 2016 DataNexus Inc.  All Rights Reserved
+---
+# First, setup a fact that can use to test whether or not a local application
+# file on the Ansible node was provided (or not)
+- set_fact:
+    install_from_file: "{{not(local_app_file is undefined or local_app_file is none or local_app_file | trim == '')}}"
+# if we're not installing our application from a local file then we're installing
+# it from a URL
+- block:
+  - name: Download "{{application}}" distribution file to /tmp
+    become: true
+    get_url:
+      url: "{{app_url}}"
+      dest: /tmp
+      mode: 0644
+      validate_certs: no
+    environment: "{{environment_vars}}"
+  - set_fact:
+      local_filename: "{{app_url | basename}}"
+  when: not(install_from_file)
+# if we're installing from a repository (either a local repository or the standard
+# Confluent repository), then install the Confluent package from that repository
+- block:
+  - name: Copy "{{application}}" distribution file Ansible host to /tmp
+    copy:
+      src: "{{local_app_file}}"
+      dest: "/tmp"
+      mode: 0644
+  - set_fact:
+      local_filename: "{{local_app_file | basename}}"
+  when: install_from_file
+# in either case, install the package
+- block:
+  - name: Install "{{application}}" distribution file
+    yum:
+      name: "/tmp/{{local_filename}}"
+      state: present
+    environment: "{{environment_vars}}"
+  become: true
