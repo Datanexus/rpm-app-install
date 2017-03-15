@@ -36,13 +36,31 @@
       setup:
     - include_role:
         name: setup-web-proxy
-    - include: 'tasks/add-epel-repo.yml'
+    - include_role:
+        name: add-local-repository
+      vars:
+        yum_repository: "{{yum_repo_url}}"
+      when: yum_repo_url is defined or reset_mirrors
+    - block:
+      - include_role:
+          name: install-packages
+        vars:
+          package_list: ["epel-release"]
+      - include_role:
+          name: add-local-repository
+        vars:
+          yum_repository: "{{epel_repo_url}}"
+          repository_name: epel
+          regex_repl_vals:
+              baseurl:
+                regex: "^#?(baseurl=)(http[s]?://[^\\/]+\\/[^0-9]*)(\\/.*)$"
+                replx: "\\g<1>{{yum_repository}}\\g<3>"
+              mirrorlist:
+                regex: "^(mirrorlist=http[s]?://mirrors.fedoraproject.org/.*)$"
+                replx: "#\\g<1>"
+        when: epel_repo_url is defined or reset_mirrors
       when: add_epel_repo
   roles:
-    - role: setup-web-proxy
-    - role: add-local-repository
-      yum_repository: "{{yum_repo_url}}"
-      when: yum_repo_url is defined
     - role: install-packages
       package_list: "{{combined_package_list}}"
     - role: dn-app-install

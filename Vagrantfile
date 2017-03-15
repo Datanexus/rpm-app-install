@@ -55,6 +55,13 @@ optparse = OptionParser.new do |opts|
     options[:app_url] = app_url.gsub(/^=/,'')
   end
 
+  options[:cran_repo_url] = nil
+  opts.on( '-r', '--cran-url CRAN_URL', 'URL of CRAN mirror' ) do |cran_repo_url|
+    # while parsing, trim an '=' prefix character off the front of the string if it exists
+    # (would occur if the value was passed using an option flag like '-c=http://localhost/tmp.tgz')
+    options[:cran_repo_url] = cran_repo_url.gsub(/^=/,'')
+  end
+
   options[:local_app_file] = nil
   opts.on( '-l', '--local-app-file File', 'Local application distribution file (package)' ) do |local_app_file|
     # while parsing, trim an '=' prefix character off the front of the string if it exists
@@ -69,9 +76,21 @@ optparse = OptionParser.new do |opts|
     options[:yum_repo_url] = yum_repo_url.gsub(/^=/,'')
   end
 
+  options[:epel_repo_url] = nil
+  opts.on( '-e', '--epel-url URL', 'Local epel repository URL' ) do |epel_repo_url|
+    # while parsing, trim an '=' prefix character off the front of the string if it exists
+    # (would occur if the value was passed using an option flag like '-e=http://192.168.1.128/epel')
+    options[:epel_repo_url] = epel_repo_url.gsub(/^=/,'')
+  end
+
   options[:reset_proxy_settings] = false
   opts.on( '-c', '--clear-proxy-settings', 'Clear existing proxy settings if no proxy is set' ) do |reset_proxy_settings|
     options[:reset_proxy_settings] = true
+  end
+
+  options[:reset_undef_mirrors] = false
+  opts.on( '-d', '--use-default-mirrors', 'Reset YUM/EPEL mirror definitions (if not defined)' ) do |reset_undef_mirrors|
+    options[:use_default_mirrors] = true
   end
 
   opts.on_tail( '-h', '--help', 'Display this screen' ) do
@@ -119,6 +138,16 @@ end
 
 if options[:app_url] && !(options[:app_url] =~ URI::regexp)
   print "ERROR; input app URL '#{options[:app_url]}' is not a valid URL\n"
+  exit 3
+end
+
+if options[:epel_repo_url] && !(options[:epel_repo_url] =~ URI::regexp)
+  print "ERROR; input epel URL '#{options[:epel_repo_url]}' is not a valid URL\n"
+  exit 3
+end
+
+if options[:cran_repo_url] && !(options[:cran_repo_url] =~ URI::regexp)
+  print "ERROR; input app URL '#{options[:cran_repo_url]}' is not a valid URL\n"
   exit 3
 end
 
@@ -202,6 +231,17 @@ if node_addr_array && node_addr_array.size > 0
             # set the `rstudio_url` if a value for that parameter was included on the command-line
             if options[:rstudio_url]
               ansible.extra_vars[:app_url] = options[:rstudio_url]
+            end
+            # set the `cran_repo_url` if a value for that parameter was included on the command-line
+            if options[:cran_repo_url]
+              ansible.extra_vars[:cran_repo_url] = options[:cran_repo_url]
+            end
+            # set the `epel_repo_url` if a value for that parameter was included on the command-line
+            if options[:epel_repo_url]
+              ansible.extra_vars[:epel_repo_url] = options[:epel_repo_url]
+            end
+            if options[:reset_undef_mirrors]
+              ansible.extra_vars[:reset_undef_mirrors] = true
             end
           end     # end `machine.vm.provision "ansible" do |ansible|`
         end

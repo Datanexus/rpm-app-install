@@ -11,19 +11,21 @@ application_package_list: ['R']
 # is the EPEL repository needed?
 add_epel_repo: true
 
+# used to define an array of commands that should be run after installing
+# the dependencies (above) but before installing the application (below)
+pre_install_commands: []
+
 # default URL used to download the RStudio server package
 rstudio_version: '1.0.136'
 app_url: "https://download2.rstudio.org/rstudio-server-rhel-{{rstudio_version}}-x86_64.rpm"
 
-# used to add extra repositories to the list of repositories in the
-# `local.repo` file that is deployed to a node when we're adding a
-# local repository to use in the provisioning process
-#local_repository_url: http://{{yum_repository}}/local.repo
-#local_repository_extra_keys: http://{{yum_repository}}/local-keys.json
+# used to define an array of commands that should be run after installing
+# the application
+post_install_commands: []
 
 # used to define the file (in a local directory) containing the application
 # (as an RPM file)
-local_rstudio_file: ""
+local_application_file: ""
 
 # path used to access private keys (defaults to the current working directory)
 private_key_path: "."
