@@ -19,7 +19,8 @@ add_epel_repo: true
 # is downloaded and isntalled from the RStudio CRAN mirror)
 default_cran_url: 'https://cran.rstudio.com/'
 pre_install_commands:
-  - {command: "R -e \"install.packages('shiny', repos='{{cran_repo_url | default(default_cran_url)}}')\"", become_root: true}
+  - {command: "R -e \"install.packages('shiny', repos='{{cran_repo_url | default(default_cran_url)}}')\"", become_root: true, environment: "{{ proxy_env | default({}) }}" }
+  - {command: "R -e \"install.packages('rmarkdown', repos='{{cran_repo_url | default(default_cran_url)}}')\"", become_root: true, environment: "{{ proxy_env | default({}) }}" }
 
 # default URL used to download the RStudio server package
 shiny_version: '1.5.1.834'

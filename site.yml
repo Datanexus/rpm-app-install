@@ -40,7 +40,7 @@
         name: add-local-repository
       vars:
         yum_repository: "{{yum_repo_url}}"
-      when: yum_repo_url is defined or reset_mirrors
+      when: yum_repo_url is defined or (reset_mirrors is defined and reset_mirrors)
     - block:
       - include_role:
           name: install-packages
@@ -53,12 +53,12 @@
           repository_name: epel
           regex_repl_vals:
               baseurl:
-                regex: "^#?(baseurl=)(http[s]?://[^\\/]+\\/[^0-9]*)(\\/.*)$"
+                regex: '^#?(baseurl=)(http[s]?://[^\/]+\/[^0-9]*)(\/.*)$'
                 replx: "\\g<1>{{yum_repository}}\\g<3>"
               mirrorlist:
                 regex: "^(mirrorlist=http[s]?://mirrors.fedoraproject.org/.*)$"
                 replx: "#\\g<1>"
-        when: epel_repo_url is defined or reset_mirrors
+        when: epel_repo_url is defined or (reset_mirrors is defined and reset_mirrors)
       when: add_epel_repo
   roles:
     - role: install-packages
