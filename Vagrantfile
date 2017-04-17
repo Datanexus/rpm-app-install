@@ -226,7 +226,7 @@ if node_addr_array && node_addr_array.size > 0
               local_app_file: options[:local_app_file],
               host_inventory: node_addr_array,
               reset_proxy_settings: options[:reset_proxy_settings],
-              cloud: "vagrant"
+              inventory_type: "static"
             }
             # set the `rstudio_url` if a value for that parameter was included on the command-line
             if options[:rstudio_url]
