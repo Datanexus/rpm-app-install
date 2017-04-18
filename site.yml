@@ -10,17 +10,17 @@
       vars:
         host_group_list:
           - name: "{{application}}"
-      when: cloud == 'aws' or cloud == 'osp'
+      when: inventory_type == 'dynamic'
     - include_role:
         name: build-app-host-groups
       vars:
         host_group_list:
           - { name: "{{application}}", node_list: "{{host_inventory}}" }
-      when: cloud == "vagrant"
+      when: inventory_type == 'static'
 
 # Then, deploy our application to the nodes in the application host group
 - name: Install application on the selected server(s)
-  hosts: "{{application}}"
+  hosts: "{{application}}:&{{application}}_nodes"
   gather_facts: no
   vars_files:
     - "vars/{{application | default('app-install')}}.yml"
